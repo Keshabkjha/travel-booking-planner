@@ -1,0 +1,82 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.travelplanner.model.Hotel" %>
+<%@ page session="true" %>
+<%
+    Object userObj = session.getAttribute("user");
+    if (userObj == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    Hotel hotel = (Hotel) request.getAttribute("hotel");
+    if (hotel == null) {
+        response.sendRedirect("search.jsp");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        body { background: #f7fafd; margin: 0; padding: 0; }
+        .payment-section {
+            max-width: 500px;
+            margin: 3em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(41,128,185,0.10);
+            padding: 2.5em 2em;
+            text-align: center;
+        }
+        .payment-title {
+            color: #2980b9;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 1.2em;
+        }
+        .hotel-summary {
+            margin-bottom: 2em;
+        }
+        .hotel-summary img {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 12px;
+            margin-bottom: 1em;
+        }
+        .pay-btn {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .pay-btn:hover {
+            background: #6dd5fa;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-section">
+        <div class="payment-title">
+            <i class="fa fa-credit-card"></i> Payment
+        </div>
+        <div class="hotel-summary">
+            <img src="<%= hotel.getImageUrl() %>" alt="<%= hotel.getName() %>">
+            <h3><%= hotel.getName() %></h3>
+            <p><%= hotel.getAddress() %></p>
+            <div style="font-size:1.2em;font-weight:bold;">$<%= hotel.getPrice() %> per night</div>
+        </div>
+        <form action="../../pay" method="post">
+            <input type="hidden" name="hotelId" value="<%= hotel.getId() %>">
+            <button class="pay-btn" type="submit"><i class="fa fa-check"></i> Pay and Book</button>
+        </form>
+    </div>
+</body>
+</html>

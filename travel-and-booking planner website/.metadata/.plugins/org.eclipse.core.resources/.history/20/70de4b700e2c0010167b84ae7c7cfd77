@@ -1,0 +1,50 @@
+<%@ page import="java.util.List" %>
+<%@ page import="com.travelplanner.model.Destination" %>
+<%@ page session="true" %>
+<%
+    Object userObj = session.getAttribute("user");
+    if (userObj == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    List<Destination> results = (List<Destination>) request.getAttribute("results");
+%>
+<html>
+<head>
+    <title>Search Destinations - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <h2>Search Destinations</h2>
+    <form action="../../search" method="get">
+        <input type="text" name="keyword" placeholder="Enter destination name">
+        <input type="submit" value="Search">
+    </form>
+    <hr>
+    <%
+        if (results != null && !results.isEmpty()) {
+            for (Destination dest : results) {
+    %>
+        <div class="destination">
+            <h3><%= dest.getName() %></h3>
+            <img src="<%= dest.getImageUrl() %>" alt="<%= dest.getName() %>" width="200">
+            <p><%= dest.getDescription() %></p>
+            <form action="../../book" method="post" style="display:inline;">
+                <input type="hidden" name="refId" value="<%= dest.getId() %>">
+                <input type="hidden" name="type" value="destination">
+                <input type="submit" value="Book">
+            </form>
+        </div>
+        <hr>
+    <%
+            }
+        } else if (results != null) {
+    %>
+        <p>No destinations found.</p>
+    <%
+        }
+    %>
+    <p style="color:red">${error}</p>
+    <p><a href="dashboard.jsp">Back to Dashboard</a></p>
+</body>
+</html>

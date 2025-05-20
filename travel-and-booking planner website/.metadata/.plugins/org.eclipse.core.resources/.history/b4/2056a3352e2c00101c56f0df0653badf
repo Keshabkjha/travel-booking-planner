@@ -1,0 +1,33 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.BookingDAO;
+import com.travelplanner.model.Booking;
+import com.travelplanner.model.User;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+@WebServlet("/bookings")
+public class BookingServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        try (Connection conn = DBConnection.getConnection()) {
+            BookingDAO bookingDAO = new BookingDAO(conn);
+            List<Booking> bookings = bookingDAO.getBookingsByUser(user.getId());
+            request.setAttribute("bookings", bookings);
+            request.getRequestDispatcher("WEB-INF/jsp/bookings.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Could not load bookings: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/dashboard.jsp").forward(request, response);
+        }
+    }
+}

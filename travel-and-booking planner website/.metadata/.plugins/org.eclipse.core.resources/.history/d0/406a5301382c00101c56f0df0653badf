@@ -1,0 +1,59 @@
+package com.travelplanner.dao;
+
+import com.travelplanner.model.Train;
+import java.sql.*;
+import java.util.*;
+
+public class TrainDAO {
+    private Connection conn;
+
+    public TrainDAO(Connection conn) {
+        this.conn = conn;
+    }
+
+    public List<Train> getAllTrains() throws SQLException {
+        String sql = "SELECT * FROM trains";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        List<Train> trains = new ArrayList<>();
+        while (rs.next()) {
+            trains.add(mapTrain(rs));
+        }
+        return trains;
+    }
+
+    public List<Train> getTrainsByDestination(int destinationId) throws SQLException {
+        String sql = "SELECT * FROM trains WHERE destination_id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, destinationId);
+        ResultSet rs = stmt.executeQuery();
+        List<Train> trains = new ArrayList<>();
+        while (rs.next()) {
+            trains.add(mapTrain(rs));
+        }
+        return trains;
+    }
+
+    public Train getTrainById(int id) throws SQLException {
+        String sql = "SELECT * FROM trains WHERE id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return mapTrain(rs);
+        }
+        return null;
+    }
+
+    private Train mapTrain(ResultSet rs) throws SQLException {
+        Train t = new Train();
+        t.setId(rs.getInt("id"));
+        t.setDestinationId(rs.getInt("destination_id"));
+        t.setOperator(rs.getString("operator"));
+        t.setDeparture(rs.getString("departure"));
+        t.setArrival(rs.getString("arrival"));
+        t.setPrice(rs.getDouble("price"));
+        t.setImageUrl(rs.getString("image_url"));
+        return t;
+    }
+}

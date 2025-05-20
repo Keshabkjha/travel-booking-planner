@@ -1,0 +1,42 @@
+package com.travelplanner.controller;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.travelplanner.util.EmailUtil;
+
+import jakarta.mail.MessagingException;
+
+@WebServlet("/forgot-password")
+public class ForgotPasswordServlet extends HttpServlet {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String email = request.getParameter("email");
+        String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+
+        
+        request.getSession().setAttribute("otp", otp);
+        request.getSession().setAttribute("email", email);
+	    
+	}
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+
+        
+        request.getSession().setAttribute("otp", otp);
+        request.getSession().setAttribute("email", email);
+
+        try {
+            EmailUtil.sendOtpEmail(email, otp);
+            response.sendRedirect("verify-otp.jsp");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            response.getWriter().println("Error sending email.");
+        }
+    }
+}

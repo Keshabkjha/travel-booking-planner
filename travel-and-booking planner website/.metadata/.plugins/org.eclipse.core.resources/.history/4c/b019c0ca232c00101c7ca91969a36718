@@ -1,0 +1,91 @@
+
+
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        body {
+            background: linear-gradient(120deg, #6dd5fa 0%, #2980b9 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-card {
+            background: #fff;
+            padding: 2.5em 2em 2em 2em;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.15);
+            width: 350px;
+            max-width: 95vw;
+            text-align: center;
+        }
+        .auth-card h2 {
+            color: #2980b9;
+            margin-bottom: 1.2em;
+            font-weight: 700;
+        }
+        .auth-card input[type="email"],
+        .auth-card input[type="password"] {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0 18px 0;
+            border: 1px solid #b2bec3;
+            border-radius: 6px;
+            font-size: 1em;
+            background: #f7f7f7;
+        }
+        .auth-card input[type="submit"] {
+            width: 100%;
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .auth-card input[type="submit"]:hover {
+            background: #6dd5fa;
+            color: #2980b9;
+        }
+        .auth-card .switch-link {
+            margin-top: 1.2em;
+            font-size: 0.98em;
+        }
+        .auth-card .switch-link a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-card .switch-link a:hover {
+            text-decoration: underline;
+        }
+        .auth-card .error {
+            color: #e74c3c;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2>Login</h2>
+        <form action="/travel-planner/login" method="post">
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="submit" value="Login">
+        </form>
+        
+        <div class="error">${error}</div>
+        <div class="switch-link">
+    <p>Don't have an account?   <a href="${pageContext.request.contextPath}/register">Register here</a></p>
+        </div>
+    </div>
+</body>
+</html>

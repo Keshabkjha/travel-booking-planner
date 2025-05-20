@@ -1,0 +1,36 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.model.User;
+import com.travelplanner.dao.UserDAO;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        try (Connection conn = DBConnection.getConnection()) {
+            UserDAO userDAO = new UserDAO(conn);
+            User user = userDAO.loginUser(email, password);
+            if (user != null) {
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                // Use forward, not redirect
+                request.getRequestDispatcher("WEB-INF/jsp/dashboard.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "Invalid credentials");
+                request.getRequestDispatcher("WEB-INF/jsp/login.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Login failed: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/login.jsp").forward(request, response);
+        }
+    }
+}

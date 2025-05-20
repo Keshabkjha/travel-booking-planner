@@ -1,0 +1,43 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.BookingDAO;
+import com.travelplanner.model.Booking;
+import com.travelplanner.model.User;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+
+@WebServlet("/bookings")
+public class BookingServlet extends HttpServlet {
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("${pageContext.request.contextPath}/login.jsp");
+            return;
+        }
+        int refId = Integer.parseInt(request.getParameter("refId"));
+        String type = request.getParameter("type");
+        
+
+        Booking booking = new Booking();
+        booking.setUserId(user.getId());
+        booking.setType(type);
+        booking.setRefId(refId);
+        booking.setStatus("confirmed");
+        booking.setPaymentId("SIMULATED_PAYMENT");
+
+        try (Connection conn = DBConnection.getConnection()) {
+            BookingDAO bookingDAO = new BookingDAO(conn);
+            bookingDAO.addBooking(booking);
+            response.sendRedirect("${pageContext.request.contextPath}/bookings.jsp");
+        } catch (Exception e) {
+            request.setAttribute("error", "Booking failed: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        }
+    }
+}

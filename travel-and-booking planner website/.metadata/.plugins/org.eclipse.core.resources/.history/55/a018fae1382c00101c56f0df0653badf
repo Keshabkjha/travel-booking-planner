@@ -1,0 +1,64 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.travelplanner.model.Trains" %>
+<%@ page session="true" %>
+<%
+    Object userObj = session.getAttribute("user");
+    if (userObj == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    List<Trains> trains = (List<Trains>) request.getAttribute("trains");
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Book Train - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        .options-section { max-width: 1000px; margin: 2.5em auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(41,128,185,0.10); padding: 2em 1em; }
+        .options-title { color: #2980b9; font-size: 2em; font-weight: bold; margin-bottom: 1.2em; text-align: center; }
+        .options-grid { display: flex; flex-wrap: wrap; gap: 2em; justify-content: center; }
+        .option-card { background: linear-gradient(120deg, #6dd5fa 0%, #2980b9 100%); color: #fff; border-radius: 16px; box-shadow: 0 4px 16px rgba(41,128,185,0.10); width: 260px; max-width: 90vw; margin-bottom: 1.5em; display: flex; flex-direction: column; align-items: center; padding: 1.5em 1em 1.2em 1em; }
+        .option-card img { width: 100%; max-width: 220px; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 1em; box-shadow: 0 2px 8px rgba(41,128,185,0.10); }
+        .option-card h3 { margin: 0.2em 0 0.5em 0; font-size: 1.3em; font-weight: bold; }
+        .option-card p { font-size: 1em; margin-bottom: 1.2em; color: #f0f6fa; }
+        .option-card .price { font-size: 1.1em; font-weight: bold; margin-bottom: 1em; }
+        .book-btn { background: #fff; color: #2980b9; border: none; padding: 10px 28px; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background 0.3s, color 0.3s; }
+        .book-btn:hover { background: #2980b9; color: #fff; border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <div class="options-section">
+        <div class="options-title">
+            <i class="fa fa-train"></i> Book a Train
+        </div>
+        <div class="options-grid">
+            <%
+                if (trains != null && !trains.isEmpty()) {
+                    for (Trains t : trains) {
+            %>
+                <div class="option-card">
+                    <img src="<%= t.getImageUrl() %>" alt="<%= t.getOperator() %>">
+                    <h3><%= t.getOperator() %></h3>
+                    <p>From: <%= t.getDeparture() %> <br>To: <%= t.getArrival() %></p>
+                    <div class="price">$<%= t.getPrice() %></div>
+                    <form action="${pageContext.request.contextPath}/pay" method="get">
+                        <input type="hidden" name="trainId" value="<%= t.getId() %>">
+                        <input type="hidden" name="type" value="train">
+                        <button class="book-btn" type="submit"><i class="fa fa-check"></i> Book Train</button>
+                    </form>
+                </div>
+            <%
+                    }
+                } else {
+            %>
+                <div style="color:#fff;">No trains found.</div>
+            <%
+                }
+            %>
+        </div>
+    </div>
+</body>
+</html>

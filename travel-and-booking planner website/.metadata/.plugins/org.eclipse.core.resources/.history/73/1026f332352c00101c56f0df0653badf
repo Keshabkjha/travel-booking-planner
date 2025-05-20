@@ -1,0 +1,5 @@
+package com.travelplanner.model;
+
+public class Bus {
+
+}

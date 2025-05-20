@@ -1,0 +1,98 @@
+
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        body {
+            background: linear-gradient(120deg, #2980b9 0%, #6dd5fa 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .auth-box {
+            background: #fff;
+            padding: 2.5em 2em 2em 2em;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            width: 350px;
+            max-width: 95vw;
+            text-align: center;
+        }
+        .auth-title {
+            font-size: 2em;
+            color: #2980b9;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+        .auth-box input[type="text"],
+        .auth-box input[type="email"],
+        .auth-box input[type="password"] {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0 18px 0;
+            border: 1px solid #b2bec3;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .auth-btn {
+            width: 100%;
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .auth-btn:hover {
+            background: #6dd5fa;
+            color: #2980b9;
+        }
+        .auth-link {
+            margin-top: 1.2em;
+            font-size: 1em;
+        }
+        .auth-link a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+        .error-msg {
+            color: #e74c3c;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-title">Register</div>
+            <form action="${pageContext.request.contextPath}/register" method="post">
+                <input type="text" name="name" placeholder="Full Name" required><br>
+                <input type="email" name="email" placeholder="Email" required><br>
+                <input type="password" name="password" placeholder="Password" required><br>
+                <button class="auth-btn" type="submit">Register</button>
+            </form>
+            <div class="auth-link">
+    <p>Already have an account?   <a href="${pageContext.request.contextPath}/login">Login here</a></p>
+            </div>
+            <div class="error-msg">${error}</div>
+        </div>
+    </div>
+</body>
+</html>

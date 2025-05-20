@@ -1,0 +1,33 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.HotelDAO;
+import com.travelplanner.model.Hotel;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+@WebServlet("/hotels")
+public class HotelListServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String destIdStr = request.getParameter("destinationId");
+        if (destIdStr == null) {
+            response.sendRedirect("search.jsp");
+            return;
+        }
+        int destinationId = Integer.parseInt(destIdStr);
+        try (Connection conn = DBConnection.getConnection()) {
+            HotelDAO hotelDAO = new HotelDAO(conn);
+            List<Hotel> hotels = hotelDAO.getHotelsByDestination(destinationId);
+            request.setAttribute("hotels", hotels);
+            request.getRequestDispatcher("WEB-INF/jsp/hotels.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Could not load hotels: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/hotels.jsp").forward(request, response);
+        }
+    }
+}}

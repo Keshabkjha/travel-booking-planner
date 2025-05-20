@@ -1,0 +1,249 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+
+
+
+<%@ page import="java.util.List" %>
+<%@ page import="com.travelplanner.model.Destination" %>
+<%@ page session="true" %>
+<%
+    Object userObj = session.getAttribute("user");
+    if (userObj == null) {
+        response.sendRedirect("${pageContext.request.contextPath}/login");
+        return;
+    }
+    List<Destination> results = (List<Destination>) request.getAttribute("results");
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search Destinations - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        body {
+            background: #f7fafd;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            width: 100%;
+            background: linear-gradient(90deg, #2980b9 0%, #6dd5fa 100%);
+            color: #fff;
+            padding: 0.7em 0;
+            box-shadow: 0 2px 8px rgba(41,128,185,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .logo {
+            font-size: 1.7em;
+            font-weight: bold;
+            margin-left: 2em;
+            letter-spacing: 2px;
+        }
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar ul li {
+            margin: 0 1.2em;
+        }
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        .navbar ul li a:hover, .navbar ul li a.active {
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+        }
+        .navbar .user-info {
+            margin-right: 2em;
+            font-size: 1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .navbar .user-info span {
+            margin-right: 1em;
+        }
+        .search-section {
+            max-width: 900px;
+            margin: 2.5em auto 0 auto;
+            padding: 2em 1em;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(41,128,185,0.10);
+        }
+        .search-title {
+            color: #2980b9;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 1.2em;
+            text-align: center;
+        }
+        .search-bar-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2em;
+        }
+        .search-bar-form input[type="text"] {
+            width: 320px;
+            max-width: 70vw;
+            padding: 12px 18px;
+            border: 1px solid #b2bec3;
+            border-radius: 8px 0 0 8px;
+            font-size: 1.1em;
+            outline: none;
+        }
+        .search-bar-form input[type="submit"] {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-bar-form input[type="submit"]:hover {
+            background: #6dd5fa;
+            color: #2980b9;
+        }
+        .destinations-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2em;
+            justify-content: center;
+        }
+        .destination-card {
+            background: linear-gradient(120deg, #6dd5fa 0%, #2980b9 100%);
+            color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(41,128,185,0.10);
+            width: 260px;
+            max-width: 90vw;
+            margin-bottom: 1.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5em 1em 1.2em 1em;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .destination-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(41,128,185,0.18);
+        }
+        .destination-card img {
+            width: 100%;
+            max-width: 220px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1em;
+            box-shadow: 0 2px 8px rgba(41,128,185,0.10);
+        }
+        .destination-card h3 {
+            margin: 0.2em 0 0.5em 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .destination-card p {
+            font-size: 1em;
+            margin-bottom: 1.2em;
+            color: #f0f6fa;
+        }
+        .book-btn {
+            background: #fff;
+            color: #2980b9;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+        .book-btn:hover {
+            background: #2980b9;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+        .no-results {
+            text-align: center;
+            color: #888;
+            font-size: 1.2em;
+            margin-top: 2em;
+        }
+        @media (max-width: 700px) {
+            .search-section {
+                padding: 1em 0.2em;
+            }
+            .destinations-grid {
+                flex-direction: column;
+                gap: 1em;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Travel Planner</div>
+        <ul>
+            <li><a href="${pageContext.request.contextPath}/dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+            <li><a href="${pageContext.request.contextPath}/search" class="active"><i class="fa fa-search"></i> Search</a></li>
+            <li><a href="${pageContext.request.contextPath}/bookings"><i class="fa fa-suitcase"></i> My Bookings</a></li>
+        </ul>
+        <div class="user-info">
+            <span><i class="fa fa-user-circle"></i></span>
+        </div>
+    </div>
+    <div class="search-section">
+        <div class="search-title">
+            <i class="fa fa-search-location"></i> Search Destinations
+        </div>
+        <form class="search-bar-form" action="${pageContext.request.contextPath}/search" method="get">
+            <input type="text" name="keyword" placeholder="Enter destination name..." autocomplete="off">
+            <input type="submit" value="Search">
+        </form>
+        <div class="destinations-grid">
+            <%
+                if (results != null && !results.isEmpty()) {
+                    for (Destination dest : results) {
+            %>
+                <div class="destination-card">
+                    <img src="<%= dest.getImageUrl() %>" alt="<%= dest.getName() %>">
+                    <h3><%= dest.getName() %></h3>
+                    <p><%= dest.getDescription() %></p>
+                    <form action="../../book" method="post">
+                        <input type="hidden" name="refId" value="<%= dest.getId() %>">
+                        <input type="hidden" name="type" value="destination">
+                        <button class="book-btn" type="submit"><i class="fa fa-plane-departure"></i> Book</button>
+                    </form>
+                </div>
+            <%
+                    }
+                } else if (results != null) {
+            %>
+                <div class="no-results">
+                    <i class="fa fa-frown"></i> No destinations found.
+                </div>
+            <%
+                }
+            %>
+        </div>
+        <div style="text-align:center; color:#e74c3c; margin-top:1em;">${error}</div>
+    </div>
+</body>
+</html>

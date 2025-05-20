@@ -1,0 +1,44 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.HotelDAO;
+import com.travelplanner.model.Hotel;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+
+@WebServlet("/payment")
+public class PaymentServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String hotelIdStr = request.getParameter("hotelId");
+        if (hotelIdStr == null) {
+            response.sendRedirect("search.jsp");
+            return;
+        }
+        int hotelId = Integer.parseInt(hotelIdStr);
+        try (Connection conn = DBConnection.getConnection()) {
+            HotelDAO hotelDAO = new HotelDAO(conn);
+            Hotel hotel = hotelDAO.getHotelById(hotelId);
+            for (Hotel h : hotelDAO.getHotelsByDestination(-1)) { // You may want to add a getHotelById method for efficiency
+                if (h.getId() == hotelId) {
+                    hotel = h;
+                    break;
+                }
+            }
+            if (hotel == null) {
+                request.setAttribute("error", "Hotel not found.");
+                request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+                return;
+            }
+            request.setAttribute("hotel", hotel);
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Could not load hotel: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        }
+    }
+
+}

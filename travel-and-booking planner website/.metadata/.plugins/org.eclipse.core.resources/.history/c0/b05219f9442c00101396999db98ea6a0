@@ -1,0 +1,95 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.BusDAO;
+import com.travelplanner.dao.FlightDAO;
+import com.travelplanner.dao.HotelDAO;
+import com.travelplanner.dao.TrainDAO;
+import com.travelplanner.model.Bus;
+import com.travelplanner.model.Flight;
+import com.travelplanner.model.Hotel;
+import com.travelplanner.model.Trains;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+
+@WebServlet("/pay")
+public class PaymentServlet extends HttpServlet {
+    
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String type = request.getParameter("type");
+        String idStr = request.getParameter(type + "Id"); // e.g., flightId, trainId, busId, hotelId
+        if (type == null || idStr == null) {
+            response.sendRedirect("dashboard.jsp");
+            return;
+        }
+        int id = Integer.parseInt(idStr);
+        try (Connection conn = DBConnection.getConnection()) {
+            switch (type) {
+                case "flight":
+                    FlightDAO flightDAO = new FlightDAO(conn);
+                    Flight flight = flightDAO.getFlightById(id);
+                    request.setAttribute("flight", flight);
+                    break;
+                case "train":
+                    TrainDAO trainDAO = new TrainDAO(conn);
+                    Trains train = trainDAO.getTrainById(id);
+                    request.setAttribute("train", train);
+                    break;
+                case "bus":
+                    BusDAO busDAO = new BusDAO(conn);
+                    Bus bus = busDAO.getBusById(id);
+                    request.setAttribute("bus", bus);
+                    break;
+                case "hotel":
+                    HotelDAO hotelDAO = new HotelDAO(conn);
+                    Hotel hotel = hotelDAO.getHotelById(id);
+                    request.setAttribute("hotel", hotel);
+                    break;
+            }
+            request.setAttribute("type", type);
+            request.setAttribute("refId", id);
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Could not load booking: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        }
+    }
+
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        com.travelplanner.model.User user = (com.travelplanner.model.User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        String type = request.getParameter("type");
+        String refIdStr = request.getParameter("refId");
+        if (type == null || refIdStr == null) {
+            response.sendRedirect("bookings.jsp");
+            return;
+        }
+        int refId = Integer.parseInt(refIdStr);
+
+        try (Connection conn = DBConnection.getConnection()) {
+            com.travelplanner.dao.BookingDAO bookingDAO = new com.travelplanner.dao.BookingDAO(conn);
+            com.travelplanner.model.Booking booking = new com.travelplanner.model.Booking();
+            booking.setUserId(user.getId());
+            booking.setType(type);
+            booking.setRefId(refId);
+            booking.setStatus("confirmed");
+            booking.setPaymentId("SIMULATED_PAYMENT");
+            bookingDAO.addBooking(booking);
+            response.sendRedirect("bookings.jsp");
+        } catch (Exception e) {
+            request.setAttribute("error", "Booking failed: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payment.jsp").forward(request, response);
+        }
+    }
+}

@@ -1,0 +1,73 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="com.travelplanner.model.Hotel" %>
+<%@ page session="true" %>
+<%
+    String hotelId = request.getParameter("hotelId");
+    String destinationId = request.getParameter("destinationId");
+    String price = request.getParameter("price");
+    if (session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment - Travel Planner</title>
+    <style>
+        body { background: #f7fafd; margin: 0; padding: 0; }
+        .payment-section {
+            max-width: 400px;
+            margin: 4em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(41,128,185,0.10);
+            padding: 2em 2em 1.5em 2em;
+            text-align: center;
+        }
+        .payment-title {
+            color: #2980b9;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 1.2em;
+        }
+        .pay-btn {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.5em;
+            transition: background 0.3s;
+        }
+        .pay-btn:hover {
+            background: #6dd5fa;
+            color: #2980b9;
+        }
+        .price {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-section">
+        <div class="payment-title">Payment</div>
+        <div class="price">Total: $<%= price %></div>
+        <form action="${pageContext.request.contextPath}/pay" method="post">
+            <input type="hidden" name="hotelId" value="<%= hotelId %>">
+            <input type="hidden" name="destinationId" value="<%= destinationId %>">
+            <input type="hidden" name="price" value="<%= price %>">
+            <!-- Simulate payment fields -->
+            <input type="text" name="card" placeholder="Card Number" required style="padding:10px;width:90%;margin-bottom:1em;border-radius:6px;border:1px solid #ccc;"><br>
+            <input type="text" name="name" placeholder="Name on Card" required style="padding:10px;width:90%;margin-bottom:1em;border-radius:6px;border:1px solid #ccc;"><br>
+            <button class="pay-btn" type="submit">Pay & Book</button>
+        </form>
+    </div>
+</body>
+</html>

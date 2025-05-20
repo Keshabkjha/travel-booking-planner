@@ -1,0 +1,18 @@
+package com.travelplanner.service;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
+
+@WebListener
+public class MySQLCleanupContextListener implements ServletContextListener {
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
+    }
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+    	
+    }
+}

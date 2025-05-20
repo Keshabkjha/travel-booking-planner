@@ -1,0 +1,52 @@
+package com.travelplanner.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.travelplanner.model.Flight;
+
+public class FlightDAO {
+    private Connection conn;
+    public FlightDAO(Connection conn) { this.conn = conn; }
+    public List<Flight> getFlightsByDestination(int destinationId) throws SQLException {
+        String sql = "SELECT * FROM flights WHERE destination_id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, destinationId);
+        ResultSet rs = stmt.executeQuery();
+        List<Flight> flights = new ArrayList<>();
+        while (rs.next()) {
+            Flight f = new Flight();
+            f.setId(rs.getInt("id"));
+            f.setDestinationId(rs.getInt("destination_id"));
+            f.setAirline(rs.getString("airline"));
+            f.setDeparture(rs.getString("departure"));
+            f.setArrival(rs.getString("arrival"));
+            f.setPrice(rs.getDouble("price"));
+            f.setImageUrl(rs.getString("image_url"));
+            flights.add(f);
+        }
+        return flights;
+    }
+    public Flight getFlightById(int id) throws SQLException {
+        String sql = "SELECT * FROM flights WHERE id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            Flight f = new Flight();
+            f.setId(rs.getInt("id"));
+            f.setDestinationId(rs.getInt("destination_id"));
+            f.setAirline(rs.getString("airline"));
+            f.setDeparture(rs.getString("departure"));
+            f.setArrival(rs.getString("arrival"));
+            f.setPrice(rs.getDouble("price"));
+            f.setImageUrl(rs.getString("image_url"));
+            return f;
+        }
+        return null;
+    }
+}

@@ -1,0 +1,215 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.travelplanner.model.User" %>
+<%@ page session="true" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        body {
+            background: #f7fafd;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            width: 100%;
+            background: linear-gradient(90deg, #2980b9 0%, #6dd5fa 100%);
+            color: #fff;
+            padding: 0.7em 0;
+            box-shadow: 0 2px 8px rgba(41,128,185,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .logo {
+            font-size: 1.7em;
+            font-weight: bold;
+            margin-left: 2em;
+            letter-spacing: 2px;
+        }
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar ul li {
+            margin: 0 1.2em;
+        }
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        .navbar ul li a:hover, .navbar ul li a.active {
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+        }
+        .navbar .user-info {
+            margin-right: 2em;
+            font-size: 1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .navbar .user-info span {
+            margin-right: 1em;
+        }
+        .dashboard-hero {
+            max-width: 900px;
+            margin: 3em auto 2em auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(41,128,185,0.10);
+            padding: 2.5em 2em;
+            text-align: center;
+        }
+        .dashboard-hero h2 {
+            color: #2980b9;
+            font-size: 2.5em;
+            margin-bottom: 0.3em;
+            font-weight: bold;
+        }
+        .dashboard-hero p {
+            color: #555;
+            font-size: 1.2em;
+            margin-bottom: 2em;
+        }
+        .dashboard-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2em;
+        }
+        .dashboard-action-card {
+            background: linear-gradient(120deg, #6dd5fa 0%, #2980b9 100%);
+            color: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(41,128,185,0.10);
+            padding: 2em 1.5em;
+            min-width: 220px;
+            max-width: 260px;
+            margin: 1em 0;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .dashboard-action-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(41,128,185,0.18);
+            text-decoration: none;
+            color: #fff;
+        }
+        .dashboard-action-card i {
+            font-size: 2.2em;
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        @media (max-width: 700px) {
+            .dashboard-hero {
+                padding: 1.2em 0.5em;
+            }
+            .dashboard-actions {
+                flex-direction: column;
+                gap: 1em;
+            }
+        }
+    </style>
+    <!-- Optionally, use Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Travel Planner</div>
+        <ul>
+            <li><a href="${pageContext.request.contextPath}/dashboard" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+            <li><a href="${pageContext.request.contextPath}/search"><i class="fa fa-search"></i> Search</a></li>
+            <li><a href="${pageContext.request.contextPath}/bookings"><i class="fa fa-suitcase"></i> My Bookings</a></li>
+            <% if ("admin".equals(user.getRole())) { %>
+                <li><a href="admin_dashboard.jsp"><i class="fa fa-cogs"></i> Admin Panel</a></li>
+            <% } %>
+        </ul>
+        <div class="user-info">
+            <span><i class="fa fa-user-circle"></i> <%= user.getName() %></span>
+            <a href="${pageContext.request.contextPath}/logout" style="color:#fff;text-decoration:none;font-weight:bold;"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+    <div class="dashboard-hero">
+        <h2>Welcome, <%= user.getName() %>!</h2>
+        <p>
+            Plan your next adventure, discover new destinations, and manage your bookings with ease.<br>
+            Everything you need for your journey is just a click away.
+        </p>
+        <div class="dashboard-actions">
+            <a href="${pageContext.request.contextPath}/search" class="dashboard-action-card">
+                <i class="fa fa-search-location"></i>
+                <div>Search Destinations</div>
+            </a>
+            <a href="${pageContext.request.contextPath}/bookings" class="dashboard-action-card">
+                <i class="fa fa-suitcase-rolling"></i>
+                <div>My Bookings</div>
+            </a>
+            <% if ("admin".equals(user.getRole())) { %>
+            <a href="${pageContext.request.contextPath}/admin_dashboard" class="dashboard-action-card">
+                <i class="fa fa-cogs"></i>
+                <div>Admin Panel</div>
+            </a>
+            <% } %>
+            <a href="${pageContext.request.contextPath}/logout" class="dashboard-action-card">
+                <i class="fa fa-sign-out-alt"></i>
+                <div>Logout</div>
+            </a>
+        </div>
+        <div class="dashboard-actions">
+    <a href="${pageContext.request.contextPath}/search" class="dashboard-action-card">
+        <i class="fa fa-search-location"></i>
+        <div>Search Destinations</div>
+    </a>
+    <a href="${pageContext.request.contextPath}/flights" class="dashboard-action-card">
+        <i class="fa fa-plane"></i>
+        <div>Book Flight</div>
+    </a>
+    <a href="${pageContext.request.contextPath}/trains" class="dashboard-action-card">
+        <i class="fa fa-train"></i>
+        <div>Book Train</div>
+    </a>
+    <a href="${pageContext.request.contextPath}/buses" class="dashboard-action-card">
+        <i class="fa fa-bus"></i>
+        <div>Book Bus</div>
+    </a>
+    <a href="${pageContext.request.contextPath}/bookings" class="dashboard-action-card">
+        <i class="fa fa-suitcase-rolling"></i>
+        <div>My Bookings</div>
+    </a>
+    <% if ("admin".equals(user.getRole())) { %>
+    <a href="${pageContext.request.contextPath}/admin_dashboard" class="dashboard-action-card">
+        <i class="fa fa-cogs"></i>
+        <div>Admin Panel</div>
+    </a>
+    <% } %>
+    <a href="${pageContext.request.contextPath}/logout" class="dashboard-action-card">
+        <i class="fa fa-sign-out-alt"></i>
+        <div>Logout</div>
+    </a>
+</div>
+    </div>
+</body>
+</html>
+

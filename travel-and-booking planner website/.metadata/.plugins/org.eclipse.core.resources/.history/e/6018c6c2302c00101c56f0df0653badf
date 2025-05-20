@@ -1,0 +1,47 @@
+package com.travelplanner.dao;
+
+import com.travelplanner.model.Hotel;
+import java.sql.*;
+import java.util.*;
+
+public class HotelDAO {
+    private Connection conn;
+    public HotelDAO(Connection conn) { this.conn = conn; }
+
+    public List<Hotel> getHotelsByDestination(int destinationId) throws SQLException {
+        String sql = "SELECT * FROM hotels WHERE destination_id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, destinationId);
+        ResultSet rs = stmt.executeQuery();
+        List<Hotel> hotels = new ArrayList<>();
+        
+        while (rs.next()) {
+            Hotel h = new Hotel();
+            h.setId(rs.getInt("id"));
+            h.setName(rs.getString("name"));
+            h.setDestinationId(rs.getInt("destination_id"));
+            h.setAddress(rs.getString("address"));
+            h.setPrice(rs.getDouble("price"));
+            h.setImageUrl(rs.getString("image_url"));
+            hotels.add(h);
+        }
+        return hotels;
+    }
+    public Hotel getHotelById(int id) throws SQLException {
+        String sql = "SELECT * FROM hotels WHERE id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            Hotel h = new Hotel();
+            h.setId(rs.getInt("id"));
+            h.setName(rs.getString("name"));
+            h.setDestinationId(rs.getInt("destination_id"));
+            h.setAddress(rs.getString("address"));
+            h.setPrice(rs.getDouble("price"));
+            h.setImageUrl(rs.getString("image_url"));
+            return h;
+        }
+        return null;
+    }
+}

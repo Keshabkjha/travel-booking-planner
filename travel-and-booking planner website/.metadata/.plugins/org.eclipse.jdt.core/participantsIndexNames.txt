@@ -1,0 +1,7 @@
+INDEX VERSION 1.134
+/Users/avarn/travel-and-booking planner/.metadata/.plugins/org.eclipse.jst.jsp.core/jspsearch/2746233226.index
+/travel-planner/src/main/resources
+/Users/avarn/travel-and-booking planner/.metadata/.plugins/org.eclipse.jst.jsp.core/jspsearch/3813961241.index
+/travel-planner/src/main/java
+/Users/avarn/travel-and-booking planner/.metadata/.plugins/org.eclipse.jst.jsp.core/jspsearch/1087283238.index
+/travel-planner/src/main/java

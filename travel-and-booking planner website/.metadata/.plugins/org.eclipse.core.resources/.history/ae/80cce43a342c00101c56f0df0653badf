@@ -1,0 +1,68 @@
+package com.travelplanner.controller;
+
+import com.travelplanner.dao.HotelDAO;
+import com.travelplanner.model.Hotel;
+import com.travelplanner.service.DBConnection;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.Connection;
+
+@WebServlet("/pay")
+public class PaymentServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String hotelIdStr = request.getParameter("hotelId");
+        if (hotelIdStr == null) {
+            response.sendRedirect("search.jsp");
+            return;
+        }
+        int hotelId = Integer.parseInt(hotelIdStr);
+        try (Connection conn = DBConnection.getConnection()) {
+            HotelDAO hotelDAO = new HotelDAO(conn);
+            Hotel hotel = hotelDAO.getHotelById(hotelId);
+            request.setAttribute("hotel", hotel);
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Could not load hotel: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Booking logic
+        HttpSession session = request.getSession();
+        com.travelplanner.model.User user = (com.travelplanner.model.User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        String hotelIdStr = request.getParameter("hotelId");
+        if (hotelIdStr == null) {
+            response.sendRedirect("${pageContext.request.contextPath}/search");
+            return;
+        }
+        int hotelId = Integer.parseInt(hotelIdStr);
+
+        // Save booking
+        try (Connection conn = DBConnection.getConnection()) {
+            com.travelplanner.dao.BookingDAO bookingDAO = new com.travelplanner.dao.BookingDAO(conn);
+            com.travelplanner.model.Booking booking = new com.travelplanner.model.Booking();
+            booking.setUserId(user.getId());
+            booking.setType("hotel");
+            booking.setRefId(hotelId);
+            booking.setStatus("confirmed");
+            booking.setPaymentId("SIMULATED_PAYMENT");
+            bookingDAO.addBooking(booking);
+            response.sendRedirect("bookings.jsp");
+        } catch (Exception e) {
+            request.setAttribute("error", "Booking failed: " + e.getMessage());
+            request.getRequestDispatcher("WEB-INF/jsp/payments.jsp").forward(request, response);
+        }
+    }
+}

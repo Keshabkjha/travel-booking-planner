@@ -1,0 +1,55 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.travelplanner.model.Flight" %>
+<%@ page session="true" %>
+<%
+    Object userObj = session.getAttribute("user");
+    if (userObj == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    List<Flight> flights = (List<Flight>) request.getAttribute("flights");
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Book Flight - Travel Planner</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        /* Use your modern card/grid styles here */
+    </style>
+</head>
+<body>
+    <div class="options-section">
+        <div class="options-title">
+            <i class="fa fa-plane"></i> Book a Flight
+        </div>
+        <div class="options-grid">
+            <%
+                if (flights != null && !flights.isEmpty()) {
+                    for (Flight f : flights) {
+            %>
+                <div class="option-card">
+                    <img src="<%= f.getImageUrl() %>" alt="<%= f.getAirline() %>">
+                    <h3><%= f.getAirline() %></h3>
+                    <p>From: <%= f.getDeparture() %> <br>To: <%= f.getArrival() %></p>
+                    <div class="price">$<%= f.getPrice() %></div>
+                    <form action="pay" method="get">
+                        <input type="hidden" name="flightId" value="<%= f.getId() %>">
+                        <input type="hidden" name="type" value="flight">
+                        <button class="book-btn" type="submit"><i class="fa fa-check"></i> Book Flight</button>
+                    </form>
+                </div>
+            <%
+                    }
+                } else {
+            %>
+                <div style="color:#fff;">No flights found.</div>
+            <%
+                }
+            %>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+package com.travelplanner.dao;
+
+import com.travelplanner.model.Booking;
+import java.sql.*;
+import java.util.*;
+
+public class BookingDAO {
+    private Connection conn;
+
+    public BookingDAO(Connection conn) {
+        this.conn = conn;
+    }
+
+    public boolean addBooking(Booking booking) throws SQLException {
+        String sql = "INSERT INTO bookings (user_id, type, ref_id, status, payment_id) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, booking.getUserId());
+        stmt.setString(2, booking.getType());
+        stmt.setInt(3, booking.getRefId());
+        stmt.setString(4, booking.getStatus());
+        stmt.setString(5, booking.getPaymentId());
+        return stmt.executeUpdate() > 0;
+    }
+
+    public List<Booking> getBookingsByUser(int userId) throws SQLException {
+        String sql = "SELECT * FROM bookings WHERE user_id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        List<Booking> list = new ArrayList<>();
+        while (rs.next()) {
+            Booking b = new Booking();
+            b.setId(rs.getInt("id"));
+            b.setUserId(rs.getInt("user_id"));
+            b.setType(rs.getString("type"));
+            b.setRefId(rs.getInt("ref_id"));
+            b.setStatus(rs.getString("status"));
+            b.setPaymentId(rs.getString("payment_id"));
+            list.add(b);
+        }
+        return list;
+    }
+    public boolean deleteBooking(int bookingId) throws SQLException {
+        String sql = "DELETE FROM bookings WHERE id=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, bookingId);
+        return stmt.executeUpdate() > 0;
+    }
+}
